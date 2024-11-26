@@ -1,38 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Main;
-
-/**
- *
- * @author USUARIA
- */
 
 import P1.ParqueaderoApp;
 import P2.TurnoEPS;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Main {
     public static JFrame frame;
     public static JButton[] botones;
 
     public static void main(String[] args) {
-        // *** AJUSTAR EL TITULO DE LA VENTANA (JFRAME) DEL MENU ***
-        String titulo = "Lab04: PILAS Y COLAS ";
+        // Título de la ventana
+        String titulo = "Lab04: PILAS Y COLAS";
 
-        // *** AJUSTAR LOS MENSAJES QUE HAN DE APARECER EN EL MENU ***
-        String opciones[] = {"INTERFAZ PARQUEADERO ", " INTERFAZ HOSPITAL "};
-
+        // Opciones del menú
+        String[] opciones = {"Interfaz Parqueadero", "Interfaz Hospital"};
         final int numop = opciones.length;
 
         // Crear el marco de la ventana
         frame = new JFrame(titulo);
-        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 50 * numop);
         frame.setLayout(new BorderLayout());
 
@@ -47,26 +35,17 @@ public class Main {
         for (int i = 0; i < numop; i++) {
             final int index = i; // Variable final para usar en el ActionListener
             botones[i] = new JButton(opciones[i]);
-            botones[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // *** AJUSTAR SEGUN LAS OPCIONES DEL MENU ***
-                   switch (index) {
-                case 0:
-                    new Thread(() -> {
-                        ParqueaderoApp.main(new String[]{});
-                    }).start();
-                    frame.dispose();  // Cerrar la ventana del menú
-                    break;
-                case 1:
-                    new Thread(() -> {
-                        new TurnoEPS().setVisible(true);
-                    }).start();
-                    frame.dispose();  // Cerrar la ventana del menú
-                    break;
-                        
+            botones[i].addActionListener((ActionEvent e) -> {
+                // Ejecutar según la opción seleccionada
+                switch (index) {
+                    case 0 -> {
+                        new Thread(() -> ParqueaderoApp.main(new String[]{})).start();
+                        frame.dispose(); // Cerrar la ventana del menú
                     }
-                    // *** FINAL AJUSTES ***
+                    case 1 -> {
+                        new Thread(() -> new TurnoEPS().setVisible(true)).start();
+                        frame.dispose(); // Cerrar la ventana del menú
+                    }
                 }
             });
             // Añadir el botón al panel
