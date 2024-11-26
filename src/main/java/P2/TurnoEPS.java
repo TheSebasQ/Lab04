@@ -1,4 +1,3 @@
-
 package P2;
 
 import javax.swing.*;
@@ -54,8 +53,21 @@ public class TurnoEPS extends JFrame {
         botonAgregar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nombre = campoNombre.getText();
-                int edad = Integer.parseInt(campoEdad.getText());
+                String nombre = campoNombre.getText().trim();
+                String edadText = campoEdad.getText().trim();
+                if (nombre.isEmpty() || edadText.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.");
+                    return;
+                }
+
+                int edad = 0;
+                try {
+                    edad = Integer.parseInt(edadText);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "La edad debe ser un número válido.");
+                    return;
+                }
+
                 String afiliacion = (String) comboAfiliacion.getSelectedItem();
                 String condicion = (String) comboCondicion.getSelectedItem();
 
@@ -69,7 +81,8 @@ public class TurnoEPS extends JFrame {
                 campoEdad.setText("");
             }
         });
-         botonExtenderTiempo.addActionListener(new ActionListener() {
+
+        botonExtenderTiempo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (pacienteActual != null) {
@@ -87,36 +100,20 @@ public class TurnoEPS extends JFrame {
     }
 
     private void agregarPaciente(Paciente paciente) {
-        // Se usa una lista temporal para manejar la prioridad y el orden de llegada
-        LinkedList<Paciente> listaTemporal = new LinkedList<>();
-        boolean prioridadAgregada = false;
-
-        // Agregar pacientes existentes en la cola a la lista temporal
-        while (!colaPacientes.isEmpty()) {
-            listaTemporal.add(colaPacientes.poll());
-        }
-
-        // Verificar si el nuevo paciente tiene prioridad
+        // Agregar el paciente en la cola, asegurando prioridad
         if (tienePrioridad(paciente)) {
-            // Se inserta en la lista temporal en el primer lugar que haya pacientes sin prioridad
-            for (int i = 0; i < listaTemporal.size(); i++) {
-                if (!tienePrioridad(listaTemporal.get(i))) {
-                    listaTemporal.add(i, paciente);
-                    prioridadAgregada = true;
-                    break;
-                }
+            colaPacientes.add(paciente); // Agregar al final si tiene prioridad
+        } else {
+            LinkedList<Paciente> listaTemporal = new LinkedList<>();
+            while (!colaPacientes.isEmpty()) {
+                listaTemporal.add(colaPacientes.poll());
             }
+            listaTemporal.add(paciente); // Añadir al final si no tiene prioridad
+            colaPacientes.addAll(listaTemporal); // Reinserta los pacientes en el orden correcto
         }
-        
-   // Si no se ha agregado, significa que el paciente puede ir al final
-        if (!prioridadAgregada) {
-            listaTemporal.add(paciente);
-        }
-
-        // Reinserta los pacientes en la cola original en el mismo orden
-        colaPacientes.addAll(listaTemporal);
 
         actualizarColaPacientes();
+
         if (pacienteActual == null) {
             iniciarTurno();
         }
@@ -135,7 +132,7 @@ public class TurnoEPS extends JFrame {
             etiquetaTurnoActual.setText("Turno actual: Ninguno");
             return;
         }
-        
+
         pacienteActual = colaPacientes.poll();
         numeroTurnoActual = pacienteActual.getNumeroTurno();
         etiquetaTurnoActual.setText("Turno actual: " + numeroTurnoActual + " - " + pacienteActual.getNombre());
